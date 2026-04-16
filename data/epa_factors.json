@@ -1,0 +1,162 @@
+{
+  "fuel_combustion": {
+    "diesel": {
+      "factor": 10.21,
+      "unit": "kg_co2_per_gallon",
+      "scope": 1,
+      "aliases": ["diesel fuel", "distillate fuel", "ulsd", "ultra low sulfur diesel", "hsd", "high speed diesel"]
+    },
+    "gasoline": {
+      "factor": 8.78,
+      "unit": "kg_co2_per_gallon",
+      "scope": 1,
+      "aliases": ["petrol", "motor gasoline", "unleaded", "regular gas", "premium gas"]
+    },
+    "natural_gas": {
+      "factor": 0.0544,
+      "unit": "kg_co2_per_scf",
+      "scope": 1,
+      "aliases": ["natural gas", "lng", "cng", "compressed natural gas", "pipeline gas"]
+    },
+    "lpg": {
+      "factor": 5.68,
+      "unit": "kg_co2_per_gallon",
+      "scope": 1,
+      "aliases": ["lpg", "propane", "liquefied petroleum gas", "butane"]
+    },
+    "fuel_oil": {
+      "factor": 11.27,
+      "unit": "kg_co2_per_gallon",
+      "scope": 1,
+      "aliases": ["fuel oil", "heavy fuel oil", "residual oil", "bunker fuel", "furnace oil"]
+    },
+    "coal": {
+      "factor": 2.07,
+      "unit": "kg_co2_per_kg",
+      "scope": 1,
+      "aliases": ["coal", "bituminous coal", "anthracite", "thermal coal", "steam coal"]
+    }
+  },
+  "electricity": {
+    "us_average": {
+      "factor": 0.386,
+      "unit": "kg_co2_per_kwh",
+      "scope": 2,
+      "aliases": ["electricity", "electric", "power", "grid electricity", "kwh", "mwh"]
+    },
+    "india_average": {
+      "factor": 0.708,
+      "unit": "kg_co2_per_kwh",
+      "scope": 2,
+      "aliases": []
+    },
+    "uk_average": {
+      "factor": 0.233,
+      "unit": "kg_co2_per_kwh",
+      "scope": 2,
+      "aliases": []
+    },
+    "renewable": {
+      "factor": 0.021,
+      "unit": "kg_co2_per_kwh",
+      "scope": 2,
+      "aliases": ["solar", "wind", "renewable energy", "green energy", "clean energy"]
+    }
+  },
+  "transport": {
+    "truck_freight": {
+      "factor": 0.186,
+      "unit": "kg_co2_per_ton_mile",
+      "scope": 3,
+      "aliases": ["truck", "lorry", "road freight", "road transport", "hgv", "heavy goods vehicle", "semi truck", "road haulage"]
+    },
+    "rail_freight": {
+      "factor": 0.021,
+      "unit": "kg_co2_per_ton_mile",
+      "scope": 3,
+      "aliases": ["rail", "train", "railway", "rail freight", "railroad"]
+    },
+    "air_freight": {
+      "factor": 1.086,
+      "unit": "kg_co2_per_ton_mile",
+      "scope": 3,
+      "aliases": ["air freight", "air cargo", "airplane", "aircraft", "aviation", "flight"]
+    },
+    "sea_freight": {
+      "factor": 0.048,
+      "unit": "kg_co2_per_ton_mile",
+      "scope": 3,
+      "aliases": ["sea freight", "ocean freight", "ship", "vessel", "marine", "container ship", "bulk carrier"]
+    },
+    "van_freight": {
+      "factor": 0.246,
+      "unit": "kg_co2_per_ton_mile",
+      "scope": 3,
+      "aliases": ["van", "light commercial vehicle", "lcv", "delivery van", "courier"]
+    }
+  },
+  "materials": {
+    "steel": {
+      "factor": 1.9,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["steel", "steel rods", "steel bars", "structural steel", "iron", "stainless steel", "mild steel"]
+    },
+    "aluminum": {
+      "factor": 8.14,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["aluminum", "aluminium", "aluminum sheet", "aluminum alloy"]
+    },
+    "cement": {
+      "factor": 0.83,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["cement", "portland cement", "concrete", "fly ash"]
+    },
+    "plastic": {
+      "factor": 2.53,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["plastic", "polymer", "pvc", "hdpe", "ldpe", "polypropylene", "polyethylene", "plastic resin", "nylon"]
+    },
+    "paper": {
+      "factor": 0.92,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["paper", "cardboard", "packaging paper", "corrugated", "kraft paper"]
+    },
+    "glass": {
+      "factor": 0.85,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["glass", "flat glass", "container glass", "borosilicate"]
+    },
+    "copper": {
+      "factor": 2.71,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["copper", "copper wire", "copper pipe", "brass", "bronze"]
+    },
+    "electronics": {
+      "factor": 20.0,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["electronics", "circuit board", "pcb", "semiconductor", "chips", "components"]
+    }
+  },
+  "waste": {
+    "landfill": {
+      "factor": 0.53,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["waste", "landfill", "solid waste", "msw", "municipal waste"]
+    },
+    "recycling": {
+      "factor": 0.021,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["recycling", "recycled waste"]
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "fuel_combustion": {
+    "diesel": {
+      "factor": 2.68,
+      "unit": "kg_co2_per_litre",
+      "scope": 1,
+      "aliases": ["diesel", "gas oil", "derv", "ulsd"]
+    },
+    "petrol": {
+      "factor": 2.31,
+      "unit": "kg_co2_per_litre",
+      "scope": 1,
+      "aliases": ["petrol", "gasoline", "unleaded"]
+    },
+    "natural_gas": {
+      "factor": 2.04,
+      "unit": "kg_co2_per_cubic_metre",
+      "scope": 1,
+      "aliases": ["natural gas", "gas", "mains gas"]
+    },
+    "lpg": {
+      "factor": 1.56,
+      "unit": "kg_co2_per_litre",
+      "scope": 1,
+      "aliases": ["lpg", "propane", "butane"]
+    }
+  },
+  "electricity": {
+    "uk_grid": {
+      "factor": 0.233,
+      "unit": "kg_co2_per_kwh",
+      "scope": 2,
+      "aliases": ["electricity", "electric", "grid", "power"]
+    }
+  },
+  "transport": {
+    "hgv_rigid": {
+      "factor": 0.125,
+      "unit": "kg_co2_per_tonne_km",
+      "scope": 3,
+      "aliases": ["truck", "lorry", "hgv", "heavy goods", "road freight"]
+    },
+    "rail_freight": {
+      "factor": 0.028,
+      "unit": "kg_co2_per_tonne_km",
+      "scope": 3,
+      "aliases": ["rail", "train", "freight train"]
+    },
+    "sea_tanker": {
+      "factor": 0.013,
+      "unit": "kg_co2_per_tonne_km",
+      "scope": 3,
+      "aliases": ["ship", "tanker", "sea freight", "ocean", "marine"]
+    },
+    "air_freight": {
+      "factor": 0.602,
+      "unit": "kg_co2_per_tonne_km",
+      "scope": 3,
+      "aliases": ["air", "flight", "aircraft", "aviation", "airfreight"]
+    }
+  },
+  "materials": {
+    "steel": {
+      "factor": 2.1,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["steel", "iron", "metal"]
+    },
+    "aluminium": {
+      "factor": 6.7,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["aluminium", "aluminum"]
+    },
+    "plastic": {
+      "factor": 3.14,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["plastic", "polymer", "pvc", "polyethylene"]
+    },
+    "paper": {
+      "factor": 0.91,
+      "unit": "kg_co2_per_kg",
+      "scope": 3,
+      "aliases": ["paper", "cardboard", "packaging"]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+SHIPPING MANIFEST
+Manifest No,MAN-2024-11-0044
+Date,2024-11-18
+Carrier,Blue Dart Logistics
+Customer,Vertex Industries Ltd
+
+SHIPMENT DETAILS
+Shipment 1
+Origin,Pune Maharashtra
+Destination,Hyderabad Telangana
+Mode,Road - Heavy Truck
+Weight (kg),3200
+Distance (km),560
+Cargo,Aluminium Sheets
+Quantity,3200 kg
+
+Shipment 2
+Origin,Kandla Port Gujarat
+Destination,Chennai Port Tamil Nadu
+Mode,Sea - Coastal Vessel
+Weight (tonnes),45
+Distance (km),1890
+Cargo,Crude Palm Oil
+Quantity,45000 kg
+
+Shipment 3
+Origin,Delhi NCR
+Destination,Bengaluru Karnataka
+Mode,Air Freight
+Weight (kg),120
+Distance (km),2150
+Cargo,Electronic Components PCB
+Quantity,120 kg
+
+Shipment 4
+Origin,Kolkata WB
+Destination,Mumbai Maharashtra
+Mode,Rail Freight
+Weight (tonnes),12
+Distance (km),1970
+Cargo,Steel Coils
+Quantity,12000 kg
+
+FUEL LOG (Fleet Operations - November 2024)
+Vehicle,Fuel Type,Quantity,Unit
+TN-07-AZ-1234,Diesel,380,Litres
+TN-07-BX-5678,Diesel,245,Litres
+MH-12-CY-9012,Diesel,410,Litres
+TN-07-DZ-3456,CNG,290,cubic_metre
+
+END OF MANIFEST

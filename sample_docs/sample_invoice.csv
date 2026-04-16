@@ -1,0 +1,28 @@
+Invoice Number,INV-2024-0892
+Date,2024-11-15
+Supplier,ABC Logistics & Materials Pvt Ltd
+Bill To,Green Manufacturing Co
+Address,"Plot 42, SIPCOT Industrial Estate, Chennai 600097"
+
+Line Items
+Item Description,Quantity,Unit,Unit Price (INR),Total (INR)
+High Speed Diesel (HSD),500,Litres,92.50,46250.00
+Steel Rods (MS),2000,kg,65.00,130000.00
+Corrugated Packaging Boxes,800,kg,28.00,22400.00
+
+Transport Details
+Shipment from Mumbai to Chennai via Road (Truck)
+Gross Weight: 2500 kg
+Distance: 1335 km
+Vehicle Type: Heavy Goods Vehicle (HGV)
+Fuel Used: Diesel
+
+Electricity Usage (Factory - October 2024)
+Total Units Consumed,4500,kWh
+Tariff,7.50,INR/kWh
+Electricity Bill Amount,33750.00,INR
+
+Summary
+Subtotal,232400.00
+GST 18%,41832.00
+Grand Total (INR),274232.00
