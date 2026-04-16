@@ -1,0 +1,28 @@
+[
+  {
+    "timestamp": "2026-01-01T09:00:00",
+    "scope1": 3340.0,
+    "scope2": 1180.0,
+    "scope3": 8650.0,
+    "total": 13170.0,
+    "summary": {
+      "file": "vertex_jan_ops.csv",
+      "items_extracted": 24,
+      "items_calculated": 24
+    },
+    "report_md": "Synthetic baseline run for demo company."
+  },
+  {
+    "timestamp": "2026-02-01T09:00:00",
+    "scope1": 3150.0,
+    "scope2": 1090.0,
+    "scope3": 8420.0,
+    "total": 12660.0,
+    "summary": {
+      "file": "vertex_feb_ops.csv",
+      "items_extracted": 25,
+      "items_calculated": 25
+    },
+    "report_md": "Synthetic monthly trend run for demo company."
+  }
+]

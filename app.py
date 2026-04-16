@@ -9,6 +9,10 @@ import os
 import re
 import tempfile
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -19,7 +23,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from pipeline.orchestrator import run_full_pipeline
-
+from utils.storage import get_trend, save_run
+from services.insights_store import get_dashboard_snapshot
+from services.email_service import send_report_email, should_send_email
+from services.health_check import update_pipeline_health, get_status_color_and_icon
 # ─── Chart Builders ───────────────────────────────────────────────────────────
 
 def build_scope_chart(totals: dict) -> go.Figure:
@@ -36,8 +43,8 @@ def build_scope_chart(totals: dict) -> go.Figure:
         textposition="outside"
     ))
     fig.update_layout(
-        title="Emissions by Scope (kg CO₂e)",
-        yaxis_title="kg CO₂e",
+        title="Emissions by Scope (kg CO2e)",
+        yaxis_title="kg CO2e",
         plot_bgcolor="#0f172a",
         paper_bgcolor="#0f172a",
         font_color="#e2e8f0",
@@ -98,8 +105,8 @@ def build_recommendations_chart(recommendations: list) -> go.Figure:
         textposition="outside"
     ))
     fig.update_layout(
-        title="Reduction Opportunities (kg CO₂e savings)",
-        xaxis_title="Potential Savings (kg CO₂e)",
+        title="Reduction Opportunities (kg CO2e savings)",
+        xaxis_title="Potential Savings (kg CO2e)",
         plot_bgcolor="#0f172a",
         paper_bgcolor="#0f172a",
         font_color="#e2e8f0",
@@ -133,7 +140,7 @@ def format_kpi_cards(totals: dict, pot_savings: float) -> str:
     scope3 = totals.get("scope3_kg", 0)
 
     cards = [
-        ("Total CO₂e", f"{format_compact_value(total_kg)} kg", "Total footprint from the uploaded document"),
+        ("Total CO2e", f"{format_compact_value(total_kg)} kg", "Total footprint from the uploaded document"),
         ("Scope 1", f"{format_compact_value(scope1)} kg", "Direct emissions"),
         ("Scope 3", f"{format_compact_value(scope3)} kg", "Supply chain emissions"),
         ("Savings", f"{format_compact_value(pot_savings)} kg", "Highest reduction opportunity"),
@@ -213,8 +220,8 @@ def format_narrative_insights(totals: dict, by_type: dict, recommendations: list
     lines.append("### What happened")
     if total_kg > 0:
         lines.append(
-            f"Your footprint is {total_kg:.2f} kg CO₂e. {dominant_scope_name} is the largest source at "
-            f"{dominant_scope_value:.2f} kg CO₂e ({share(dominant_scope_value):.1f}% of total)."
+            f"Your footprint is {total_kg:.2f} kg CO2e. {dominant_scope_name} is the largest source at "
+            f"{dominant_scope_value:.2f} kg CO2e ({share(dominant_scope_value):.1f}% of total)."
         )
         if scope3 > 0 and scope1 > 0:
             ratio = scope3 / scope1 if scope1 else 0
@@ -229,7 +236,7 @@ def format_narrative_insights(totals: dict, by_type: dict, recommendations: list
         lines.append("")
         lines.append("### Why it matters")
         lines.append(
-            f"The main activity type is {dominant_activity}, contributing {dominant_activity_value:.2f} kg CO₂e "
+            f"The main activity type is {dominant_activity}, contributing {dominant_activity_value:.2f} kg CO2e "
             f"({share(dominant_activity_value):.1f}% of total). That means the biggest improvement will come from "
             f"targeting this area first instead of spreading effort evenly across the business."
         )
@@ -246,7 +253,7 @@ def format_narrative_insights(totals: dict, by_type: dict, recommendations: list
     if top_rec:
         lines.append(
             f"Prioritize: {top_rec.get('title', 'the highest-savings recommendation')} "
-            f"({top_rec.get('co2e_savings_kg', 0):.1f} kg CO₂e potential savings)."
+            f"({top_rec.get('co2e_savings_kg', 0):.1f} kg CO2e potential savings)."
         )
         lines.append(
             f"This is the fastest way to reduce emissions because it targets the largest available savings first."
@@ -288,6 +295,14 @@ def create_report_pdf(report_markdown: str) -> str | None:
     """Create a temporary PDF file and return its path for download."""
     if not report_markdown:
         return None
+
+    # Normalize any remaining unsupported glyphs before ReportLab renders the PDF.
+    report_markdown = (
+        report_markdown
+        .replace("CO₂e", "CO2e")
+        .replace("CO₂", "CO2")
+        .replace("₂", "2")
+    )
 
     pdf_path = Path(tempfile.NamedTemporaryFile(delete=False, suffix="_carbon_report.pdf").name)
 
@@ -387,7 +402,15 @@ def create_report_pdf(report_markdown: str) -> str | None:
 
 # ─── Main Processing Function ─────────────────────────────────────────────────
 
-def process_document(file, region):
+def _normalize_company_id(company_name: str | None) -> str:
+    if not company_name:
+        return "demo_company"
+    company_id = company_name.strip().lower()
+    company_id = re.sub(r"[^a-z0-9]+", "_", company_id).strip("_")
+    return company_id or "demo_company"
+
+
+def process_document(file, region, company_name, email_address=None):
     if file is None:
         return (
             "Please upload a file first.",
@@ -396,7 +419,6 @@ def process_document(file, region):
             "No data",
             "No data",
             "",
-            None,
             None
         )
 
@@ -414,7 +436,6 @@ def process_document(file, region):
                 "Error",
                 "Error",
                 "",
-                None,
                 None
             )
 
@@ -430,16 +451,32 @@ def process_document(file, region):
 
         # Summary card
         total_kg = totals.get("total_kg", 0)
-        total_t = totals.get("total_tonnes", 0)
-        items_calc = analyst.get("items_calculated", 0)
-        items_skip = analyst.get("items_skipped", 0)
         pot_savings = recommender.get("total_potential_savings_kg", 0)
 
         summary_html = format_kpi_cards(totals, pot_savings)
 
+        company_id = _normalize_company_id(company_name)
+        full_report = report.get("markdown_report", "Report generation failed")
+        save_run(company_id, result.get("summary", {}), analyst, full_report)
+        trend = get_trend(company_id)
+
+        if trend.get("trend") == "insufficient_data":
+            summary_html += (
+                f"<div class='summary-note'>Company: <b>{company_id}</b><br/>"
+                f"Historical trend will appear after additional analysis runs. "
+                f"Current runs: {trend.get('runs', 0)}.</div>"
+            )
+        else:
+            direction = "increase" if trend.get("trend") == "up" else "decrease"
+            summary_html += (
+                f"<div class='summary-note'>Company: <b>{company_id}</b><br/>"
+                f"Trend vs last run: <b>{trend.get('delta_pct', 0):+.1f}%</b> "
+                f"({trend.get('delta_kg', 0):+.2f} kg CO2e, {direction}).</div>"
+            )
+
         if extracted.get("fallback_mode") and extracted.get("warning"):
             summary_html += (
-                "<div class='summary-note'>Warning: Running in fallback extraction mode. "
+                "<div class='summary-note'>Running in fallback extraction mode. "
                 "Set GROQ_API_KEY for higher-quality LLM extraction.</div>"
             )
 
@@ -459,15 +496,29 @@ def process_document(file, region):
             rec_md_lines.append(
                 f"**{i}. {r.get('title')}** — Priority {r.get('priority_score')}/10  \n"
                 f"{r.get('description', '')}  \n"
-                    f"Saves **{r.get('co2e_savings_kg', 0):.1f} kg CO₂e** | "
+                    f"Saves **{r.get('co2e_savings_kg', 0):.1f} kg CO2e** | "
                 f"Effort: {r.get('implementation_effort', '').title()} | "
                 f"Timeline: {r.get('timeframe', '').replace('_', ' ').title()}\n"
             )
         rec_md = "\n".join(rec_md_lines)
 
         # Full markdown report
-        full_report = report.get("markdown_report", "Report generation failed")
         report_pdf_file = create_report_pdf(full_report)
+        
+        # Send email if configured and email provided
+        email_status = ""
+        if email_address and report_pdf_file:
+            email_result = send_report_email(
+                pdf_path=report_pdf_file,
+                recipient_email=email_address,
+                company_name=company_id,
+                total_emissions_kg=total_kg
+            )
+            if email_result.get("success"):
+                email_status = f"<div class='summary-note' style='border-left-color: #10b981; background: rgba(16, 185, 129, 0.12); color: #86efac;'><b>Email sent:</b> {email_result.get('message')}</div>"
+            else:
+                email_status = f"<div class='summary-note'><b>Email failed:</b> {email_result.get('message')}</div>"
+            summary_html += email_status
 
         return (
             summary_html,
@@ -491,9 +542,123 @@ def process_document(file, region):
             tb[:500],
             "Error",
             "",
-                None
+            None
         )
 
+
+def get_kafka_pipeline_status() -> str:
+    """Fetch and format real Kafka pipeline status from insights store with health checks."""
+    try:
+        snapshot = get_dashboard_snapshot()
+        
+        # Update health status based on actual Kafka connectivity
+        snapshot = update_pipeline_health(snapshot)
+        
+        pipeline = snapshot.get("pipeline", {})
+        emissions = snapshot.get("emissions", {})
+        scopes = emissions.get("scope_distribution", {})
+        
+        # Get status details
+        status = pipeline.get("status", "unknown")
+        status_reason = pipeline.get("status_reason", "")
+        status_color, status_icon, status_label = get_status_color_and_icon(status)
+        
+        last_event = pipeline.get("last_event_received")
+        if last_event:
+            from datetime import datetime as dt
+            try:
+                event_time = dt.fromisoformat(last_event.replace("Z", "+00:00"))
+                now = dt.now(event_time.tzinfo)
+                seconds_ago = (now - event_time).total_seconds()
+                recency = f"{int(seconds_ago)}s ago" if seconds_ago < 60 else f"{int(seconds_ago/60)}m ago"
+            except:
+                recency = "unknown"
+        else:
+            recency = "no events"
+        
+        # Build status indicator with color coding
+        status_indicator = f"<span style='color: {status_color}; font-weight: bold;'>{status_icon} {status_label}</span>"
+        
+        # Determine section visibility based on status
+        metrics_section = ""
+        if status != "offline":
+            metrics_section = f"""
+**Processing Metrics**
+- Events Processed: **{pipeline.get("events_processed_total", 0):,}**
+- Session Throughput: **{pipeline.get("kafka_throughput_per_min", 0):.1f}** events/min
+- Consumer Latency: **{pipeline.get("consumer_latency_ms", 0):.1f}** ms
+- Queue Depth: **{pipeline.get("processing_queue_depth", 0)}** messages
+"""
+        else:
+            metrics_section = """
+**Processing Metrics**
+- Status: **Kafka broker is offline** — no metrics available
+- Last known throughput: Check when Kafka is back online
+"""
+        
+        status_md = f"""
+### Enterprise Carbon Pipeline Status
+
+**Pipeline Health**
+- Status: {status_indicator}
+- Last Event: **{recency}**
+- Reason: {status_reason}
+- Kafka Topic: `carbon-events`
+- Consumer Group: `carbon-processor-group`
+{metrics_section}
+
+**Emissions Aggregates** (cached from latest events)
+- Total CO2e Session: **{emissions.get("total_kg_session", 0):,.2f}** kg
+- Scope 1 (Direct): **{emissions.get("scope1_kg", 0):,.2f}** kg ({scopes.get("scope1", 0)}%)
+- Scope 2 (Energy): **{emissions.get("scope2_kg", 0):,.2f}** kg ({scopes.get("scope2", 0)}%)
+- Scope 3 (Supply Chain): **{emissions.get("scope3_kg", 0):,.2f}** kg ({scopes.get("scope3", 0)}%)
+
+**Data Quality**
+- Suppliers Connected: **{snapshot.get("activity", {}).get("supplier_count", 0)}**
+- Regions: **{snapshot.get("activity", {}).get("region_count", 0)}**
+- Confidence Score: **{snapshot.get("activity", {}).get("confidence_avg", 0):.1%}**
+"""
+        
+        # Show interpretation only if pipeline is connected
+        interpretation = snapshot.get("ai_insights", {}).get("interpretation", {}).get("primary", "")
+        if status == "connected" and interpretation:
+            status_md += f"""
+
+**Live Interpretation**
+{interpretation}"""
+        elif status == "offline":
+            status_md += f"""
+
+**Action Required**
+Start Kafka and consumer to resume event processing:
+```bash
+# Start infrastructure
+docker-compose up -d
+
+# Start services  
+./startup.sh start
+```"""
+        else:
+            status_md += """
+
+**Status**
+Pipeline is stale — waiting for new events from connected sources."""
+        
+        status_md += """
+
+---
+
+*This pipeline connects enterprise data sources (ERP, IoT sensors, billing systems, logistics feeds) to the carbon intelligence engine.*
+"""
+
+        return status_md
+    except Exception as e:
+        return f"Pipeline status unavailable: {str(e)}"
+
+
+def refresh_kafka_status():
+    """Refresh Kafka pipeline status display."""
+    return get_kafka_pipeline_status()
 
 # ─── Gradio UI ─────────────────────────────────────────────────────────────────
 
@@ -517,7 +682,7 @@ NAV_HERO_HTML = """
         <h1>Rise Above Emissions Noise.<br/>Audit With Precision.</h1>
         <p>
             Carbon workflow platform for invoices, manifests, and energy bills.
-            Extract data, calculate CO₂e, and generate ESG-ready insights in one flow.
+            Extract data, calculate CO2e, and generate ESG-ready insights in one flow.
         </p>
 
         <div class="workflow-steps" role="list" aria-label="Pipeline steps">
@@ -859,6 +1024,11 @@ with gr.Blocks(
 
         with gr.Row():
             with gr.Column(scale=1, elem_classes=["panel"]):
+                company_input = gr.Textbox(
+                    label="Company Name",
+                    placeholder="e.g. Vertex Industries",
+                    value="demo_company"
+                )
                 file_input = gr.File(
                     label="Upload Document (PDF or CSV)",
                     file_types=[".pdf", ".csv", ".txt"],
@@ -868,6 +1038,12 @@ with gr.Blocks(
                     choices=["US (EPA)", "UK (DEFRA)", "India"],
                     value="US (EPA)",
                     label="Region (for emission factors)"
+                )
+                email_input = gr.Textbox(
+                    label="Email Address (optional)",
+                    placeholder="Enter email to receive PDF report",
+                    type="email",
+                    value=""
                 )
                 analyze_btn = gr.Button("Analyze Emissions", variant="primary", size="lg")
 
@@ -893,6 +1069,14 @@ with gr.Blocks(
                     pie_chart_out = gr.Plot(label="Activity Breakdown", elem_classes=["chart-card"])
                 rec_chart_out = gr.Plot(label="Reduction Opportunities", elem_classes=["chart-card"])
 
+            with gr.TabItem("Event Monitor"):
+                pipeline_status = gr.Markdown(get_kafka_pipeline_status())
+                refresh_btn = gr.Button("Refresh Status", variant="secondary")
+                auto_timer = gr.Timer(5)  # Auto-refresh every 5 seconds
+                
+                refresh_btn.click(refresh_kafka_status, outputs=pipeline_status)
+                auto_timer.tick(refresh_kafka_status, outputs=pipeline_status)
+
             with gr.TabItem("Extracted Data"):
                 extraction_out = gr.Markdown("No extracted data yet.", elem_classes=["content-panel"])
 
@@ -909,7 +1093,7 @@ with gr.Blocks(
 
     analyze_btn.click(
         fn=process_document,
-        inputs=[file_input, region_select],
+        inputs=[file_input, region_select, company_input, email_input],
         outputs=[
             summary_out,
             narrative_out,

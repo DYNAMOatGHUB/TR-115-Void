@@ -1,0 +1,37 @@
+[
+  {
+    "type": "truck_shipment",
+    "scope": 3,
+    "co2e_min": 180,
+    "co2e_max": 920,
+    "suppliers": ["ABC Logistics", "Coastal Shipping", "BlueDart"]
+  },
+  {
+    "type": "electricity_bill",
+    "scope": 2,
+    "co2e_min": 220,
+    "co2e_max": 1900,
+    "suppliers": ["Sun Energy", "GridNorth Utility"]
+  },
+  {
+    "type": "diesel_purchase",
+    "scope": 1,
+    "co2e_min": 260,
+    "co2e_max": 3200,
+    "suppliers": ["FuelOne", "BlueDart"]
+  },
+  {
+    "type": "rail_shipment",
+    "scope": 3,
+    "co2e_min": 120,
+    "co2e_max": 760,
+    "suppliers": ["National Rail Freight", "Coastal Shipping"]
+  },
+  {
+    "type": "material_purchase",
+    "scope": 3,
+    "co2e_min": 420,
+    "co2e_max": 4100,
+    "suppliers": ["Vertex Steel", "OreMart", "Industrial Polymers"]
+  }
+]

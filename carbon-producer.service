@@ -1,0 +1,19 @@
+[Unit]
+Description=Carbon Intelligence Producer Service
+After=network.target kafka.target
+
+[Service]
+Type=simple
+User=ghostofsparta
+WorkingDirectory=/home/ghostofsparta/cd_key_Projects/project
+Environment="PATH=/home/ghostofsparta/cd_key_Projects/project/.venv/bin"
+EnvironmentFile=/home/ghostofsparta/cd_key_Projects/project/.env
+ExecStart=/home/ghostofsparta/cd_key_Projects/project/.venv/bin/python producer.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=carbon-producer
+
+[Install]
+WantedBy=multi-user.target

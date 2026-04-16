@@ -1,0 +1,297 @@
+{
+  "timestamp": "2026-04-17T00:38:24.590801",
+  "pipeline": {
+    "status": "connected",
+    "last_event_received": "2026-04-16T19:54:53.158771Z",
+    "events_processed_total": 1024,
+    "kafka_throughput_per_min": 25,
+    "consumer_latency_ms": 0.76,
+    "processing_queue_depth": 0,
+    "event_timestamps": [
+      "2026-04-16T19:53:53.969842+00:00",
+      "2026-04-16T19:53:55.681865+00:00",
+      "2026-04-16T19:53:58.011475+00:00",
+      "2026-04-16T19:54:00.470147+00:00",
+      "2026-04-16T19:54:02.310159+00:00",
+      "2026-04-16T19:54:04.364623+00:00",
+      "2026-04-16T19:54:06.622217+00:00",
+      "2026-04-16T19:54:09.072941+00:00",
+      "2026-04-16T19:54:11.005073+00:00",
+      "2026-04-16T19:54:12.580746+00:00",
+      "2026-04-16T19:54:15.500068+00:00",
+      "2026-04-16T19:54:18.313594+00:00",
+      "2026-04-16T19:54:21.593329+00:00",
+      "2026-04-16T19:54:24.789836+00:00",
+      "2026-04-16T19:54:28.078325+00:00",
+      "2026-04-16T19:54:30.833263+00:00",
+      "2026-04-16T19:54:34.230651+00:00",
+      "2026-04-16T19:54:36.272442+00:00",
+      "2026-04-16T19:54:39.180104+00:00",
+      "2026-04-16T19:54:41.506928+00:00",
+      "2026-04-16T19:54:44.157529+00:00",
+      "2026-04-16T19:54:45.996542+00:00",
+      "2026-04-16T19:54:48.359918+00:00",
+      "2026-04-16T19:54:50.349270+00:00",
+      "2026-04-16T19:54:53.159530+00:00"
+    ]
+  },
+  "emissions": {
+    "total_kg_session": 390584.5700000002,
+    "scope1_kg": 48779.669999999984,
+    "scope2_kg": 106213.17000000001,
+    "scope3_kg": 235591.73000000004,
+    "scope_distribution": {
+      "scope1": 12.5,
+      "scope2": 27.2,
+      "scope3": 60.3
+    }
+  },
+  "activity": {
+    "event_types_seen": {
+      "rail_shipment": 196,
+      "material_purchase": 201,
+      "truck_shipment": 199,
+      "diesel_purchase": 226,
+      "electricity_bill": 202
+    },
+    "suppliers_seen": [
+      "Coastal Shipping",
+      "National Rail",
+      "ABC Logistics",
+      "Sun Energy",
+      "Vertex Steel"
+    ],
+    "regions_seen": [
+      "US-IL",
+      "US-FL",
+      "US-PA",
+      "US-CA",
+      "US-TX"
+    ],
+    "confidence_avg": 0.9191474609374995
+  },
+  "live_events": [
+    {
+      "timestamp": "2026-04-16T19:54:53.158771Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 468.75,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:50.348501Z",
+      "supplier": "ABC Logistics",
+      "event_type": "truck_shipment",
+      "co2e_kg": 224.5,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:48.359085Z",
+      "supplier": "National Rail",
+      "event_type": "rail_shipment",
+      "co2e_kg": 109.08,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:45.995758Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 381.5,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:44.155116Z",
+      "supplier": "ABC Logistics",
+      "event_type": "diesel_purchase",
+      "co2e_kg": 170.53,
+      "scope": "scope1"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:41.506261Z",
+      "supplier": "ABC Logistics",
+      "event_type": "diesel_purchase",
+      "co2e_kg": 161.7,
+      "scope": "scope1"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:39.179389Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 538.45,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:36.271364Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 771.17,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:34.229748Z",
+      "supplier": "Coastal Shipping",
+      "event_type": "truck_shipment",
+      "co2e_kg": 243.09,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:30.832474Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 525.99,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:28.077604Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 649.43,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:24.789070Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 261.22,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:21.592683Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 263.76,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:18.312624Z",
+      "supplier": "ABC Logistics",
+      "event_type": "truck_shipment",
+      "co2e_kg": 211.77,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:15.499265Z",
+      "supplier": "Coastal Shipping",
+      "event_type": "truck_shipment",
+      "co2e_kg": 193.22,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:12.579914Z",
+      "supplier": "ABC Logistics",
+      "event_type": "diesel_purchase",
+      "co2e_kg": 113.25,
+      "scope": "scope1"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:11.004099Z",
+      "supplier": "ABC Logistics",
+      "event_type": "diesel_purchase",
+      "co2e_kg": 154.6,
+      "scope": "scope1"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:09.072191Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 261.81,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:06.621225Z",
+      "supplier": "National Rail",
+      "event_type": "rail_shipment",
+      "co2e_kg": 167.78,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:04.363828Z",
+      "supplier": "National Rail",
+      "event_type": "rail_shipment",
+      "co2e_kg": 113.48,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:02.309188Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 648.79,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:54:00.469341Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 340.43,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:58.010628Z",
+      "supplier": "ABC Logistics",
+      "event_type": "diesel_purchase",
+      "co2e_kg": 150.88,
+      "scope": "scope1"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:55.681114Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 676.35,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:53.969120Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 569.43,
+      "scope": "scope2"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:51.074083Z",
+      "supplier": "National Rail",
+      "event_type": "rail_shipment",
+      "co2e_kg": 106.17,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:48.424909Z",
+      "supplier": "Vertex Steel",
+      "event_type": "material_purchase",
+      "co2e_kg": 427.35,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:46.482050Z",
+      "supplier": "National Rail",
+      "event_type": "rail_shipment",
+      "co2e_kg": 282.65,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:43.665399Z",
+      "supplier": "ABC Logistics",
+      "event_type": "truck_shipment",
+      "co2e_kg": 273.38,
+      "scope": "scope3"
+    },
+    {
+      "timestamp": "2026-04-16T19:53:41.623614Z",
+      "supplier": "Sun Energy",
+      "event_type": "electricity_bill",
+      "co2e_kg": 446.21,
+      "scope": "scope2"
+    }
+  ],
+  "ai_insights": {
+    "dominant_scope": "scope3",
+    "dominant_activity": "diesel_purchase",
+    "recent_alert": null,
+    "trend_summary": null,
+    "interpretation": {
+      "rule_based": "**What Happened**\n- Dominant scope: Scope 3 (Supply Chain) at 60.3% of session emissions.\n- Leading activity: Diesel Purchase at 22% of processed events.\n\n**Why It Matters**\n- Session total is 390,585 kg CO\u2082e across 1024 events (average 381.4 kg per event).\n- Active suppliers in stream: 5.\n\n**Recommended Action**\n- Prioritize supplier procurement and logistics optimization.",
+      "ai_enhanced": null,
+      "primary": "**What Happened**\n- Dominant scope: Scope 3 (Supply Chain) at 60.3% of session emissions.\n- Leading activity: Diesel Purchase at 22% of processed events.\n\n**Why It Matters**\n- Session total is 390,585 kg CO\u2082e across 1024 events (average 381.4 kg per event).\n- Active suppliers in stream: 5.\n\n**Recommended Action**\n- Prioritize supplier procurement and logistics optimization.",
+      "timestamp": "2026-04-17T00:38:24.590801"
+    }
+  }
+}
