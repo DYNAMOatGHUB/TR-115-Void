@@ -52,7 +52,7 @@ Report Date: {datetime.now().strftime('%B %d, %Y')}
             f"Scope 1 direct emissions account for {totals.get('scope1_kg', 0):.2f} kg CO2e, "
             f"Scope 2 energy-related emissions for {totals.get('scope2_kg', 0):.2f} kg CO2e, "
             f"and Scope 3 supply chain emissions for {totals.get('scope3_kg', 0):.2f} kg CO2e. "
-            f"This assessment was generated using EPA GHG Emission Factors Hub (2024) "
+            f"This assessment was generated using EPA GHG Emission Factors Hub (2025) "
             f"and DEFRA conversion factors as applicable."
         )
 
@@ -63,6 +63,7 @@ def generate_markdown_report(pipeline_output: dict) -> str:
     validated = pipeline_output.get("validated", {})
     analyst = pipeline_output.get("analyst", {})
     recommender = pipeline_output.get("recommender", {})
+    emission_validation = pipeline_output.get("emission_validation", {})
 
     totals = analyst.get("totals", {})
     by_type = analyst.get("by_activity_type", {})
@@ -76,7 +77,7 @@ def generate_markdown_report(pipeline_output: dict) -> str:
     lines = []
     lines.append("# Carbon Emissions Audit Report")
     lines.append(f"**Generated:** {now}  ")
-    lines.append(f"**Methodology:** EPA GHG Emission Factors Hub (2024) + DEFRA  ")
+    lines.append(f"**Methodology:** EPA GHG Emission Factors Hub (2025) + DEFRA  ")
     lines.append(f"**Supplier/Entity:** {supplier}  ")
     lines.append("")
 
@@ -129,6 +130,38 @@ def generate_markdown_report(pipeline_output: dict) -> str:
         lines.append(f"| {desc} | {scope} | {co2e} | {source} | {conf} |")
     lines.append("")
 
+    lines.append("---")
+    lines.append("")
+    lines.append("## Validation & Audit Trail")
+    lines.append("")
+    coverage = emission_validation.get("coverage", {})
+    comparison = emission_validation.get("comparison", {})
+    confidence_label = emission_validation.get("confidence", "UNKNOWN")
+    confidence_score = emission_validation.get("confidence_score_pct", 0)
+    lines.append(f"- **Status:** {emission_validation.get('status', 'N/A')}")
+    lines.append(f"- **Coverage:** {coverage.get('mapped_items', 0)}/{coverage.get('total_items', 0)} ({coverage.get('coverage_pct', 0)}%)")
+    lines.append(f"- **Comparison Source:** {comparison.get('source', 'none')}")
+    lines.append(f"- **Effective Diff:** {emission_validation.get('deviation_percent', comparison.get('effective_diff_pct', 'N/A'))}%")
+    lines.append(f"- **Confidence:** {confidence_score}% ({confidence_label})")
+
+    why_diff = emission_validation.get("why_difference", [])
+    if why_diff:
+        lines.append("")
+        lines.append("**Why differences may occur:**")
+        for reason in why_diff:
+            lines.append(f"- {reason}")
+
+    lines.append("")
+    lines.append("**Sample calculation traces:**")
+    for r in [x for x in results if x.get("co2e_kg")][:5]:
+        lines.append(
+            f"- {r.get('description', 'Unknown')[:70]} | "
+            f"{r.get('factor_source', 'N/A')} | "
+            f"{r.get('factor_match_method', 'N/A')} | "
+            f"{r.get('calculation_formula', 'N/A')}"
+        )
+    lines.append("")
+
     if analyst.get("items_skipped", 0) > 0:
         lines.append("---")
         lines.append("")
@@ -163,7 +196,7 @@ def generate_markdown_report(pipeline_output: dict) -> str:
     lines.append("")
     lines.append("## Methodology & Data Sources")
     lines.append("")
-    lines.append("- **Emission Factors:** EPA Emission Factors for Greenhouse Gas Inventories (2024)")
+    lines.append("- **Emission Factors:** EPA Emission Factors for Greenhouse Gas Inventories (2025)")
     lines.append("- **Fallback:** DEFRA/DESNZ UK Government GHG Conversion Factors (2023)")
     lines.append("- **Formula:** CO2e = Activity Data × Emission Factor")
     lines.append("- **Extraction:** PyMuPDF + Groq LLaMA-3 70B")
@@ -182,7 +215,8 @@ def generate_csv_export(analyst_results: dict) -> str:
     writer.writerow([
         "Description", "Activity Type", "Activity Subtype",
         "Quantity", "Unit", "CO2e (kg)", "Scope", "Emission Factor",
-        "Factor Unit", "Factor Source", "Confidence", "Notes"
+        "Factor Unit", "Factor Source", "Factor Match Method", "Factor Confidence",
+        "Normalized Quantity", "Calculation Formula", "Confidence", "Notes"
     ])
 
     for r in analyst_results.get("results", []):
@@ -197,6 +231,10 @@ def generate_csv_export(analyst_results: dict) -> str:
             r.get("emission_factor", ""),
             r.get("factor_unit", ""),
             r.get("factor_source", ""),
+            r.get("factor_match_method", ""),
+            r.get("factor_confidence", ""),
+            r.get("input_quantity_normalized", ""),
+            r.get("calculation_formula", ""),
             r.get("confidence", ""),
             r.get("calculation_note", "")
         ])

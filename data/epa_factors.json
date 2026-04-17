@@ -13,7 +13,7 @@
       "aliases": ["petrol", "motor gasoline", "unleaded", "regular gas", "premium gas"]
     },
     "natural_gas": {
-      "factor": 0.0544,
+      "factor": 0.05444,
       "unit": "kg_co2_per_scf",
       "scope": 1,
       "aliases": ["natural gas", "lng", "cng", "compressed natural gas", "pipeline gas"]
@@ -39,13 +39,13 @@
   },
   "electricity": {
     "us_average": {
-      "factor": 0.386,
+      "factor": 0.35,
       "unit": "kg_co2_per_kwh",
       "scope": 2,
       "aliases": ["electricity", "electric", "power", "grid electricity", "kwh", "mwh"]
     },
     "india_average": {
-      "factor": 0.708,
+      "factor": 0.728,
       "unit": "kg_co2_per_kwh",
       "scope": 2,
       "aliases": []

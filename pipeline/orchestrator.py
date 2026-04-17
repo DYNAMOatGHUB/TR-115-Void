@@ -10,13 +10,13 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pipeline.extractor import extract_from_file
-from pipeline.validator import run_validator_agent
+from pipeline.validator import run_validator_agent, run_emission_validation
 from pipeline.analyst import run_analyst_agent
 from pipeline.recommender import run_recommender_agent
 from pipeline.report_writer import run_report_writer_agent
 
 
-def run_full_pipeline(file_path: str, region: str = "us") -> dict:
+def run_full_pipeline(file_path: str, region: str = "us", manual_validation: dict | None = None) -> dict:
     """
     Full 5-agent pipeline:
     File → Extract → Validate → Analyse → Recommend → Report
@@ -26,7 +26,7 @@ def run_full_pipeline(file_path: str, region: str = "us") -> dict:
     pipeline_output = {}
     errors = []
 
-    print(f"[1/5] Extractor Agent: Processing {os.path.basename(file_path)}...")
+    print(f"[1/6] Extractor Agent: Processing {os.path.basename(file_path)}...")
     extracted = extract_from_file(file_path)
     pipeline_output["extracted"] = extracted
 
@@ -39,26 +39,36 @@ def run_full_pipeline(file_path: str, region: str = "us") -> dict:
 
     print(f"      → Extracted {len(extracted.get('data', {}).get('items', []))} items")
 
-    print("[2/5] Validator Agent: Checking data quality...")
+    print("[2/6] Validator Agent: Checking data quality...")
     validated = run_validator_agent(extracted.get("data", {}))
     pipeline_output["validated"] = validated
     summary = validated.get("validation_summary", {})
     print(f"      → {summary.get('total_items', 0)} items | {summary.get('issues_found', 0)} issues found")
 
-    print("[3/5] Carbon Analyst Agent: Calculating emissions...")
+    print("[3/6] Carbon Analyst Agent: Calculating emissions...")
     analyst = run_analyst_agent(validated, region=region)
     pipeline_output["analyst"] = analyst
     totals = analyst.get("totals", {})
     print(f"      → Total: {totals.get('total_kg', 0):.2f} kg CO₂e")
     print(f"      → Scope 1: {totals.get('scope1_kg', 0):.2f} | Scope 2: {totals.get('scope2_kg', 0):.2f} | Scope 3: {totals.get('scope3_kg', 0):.2f}")
 
-    print("[4/5] Recommendation Agent: Generating reduction strategies...")
+    print("[4/6] Validation Engine: Comparing calculated vs baseline...")
+    emission_validation = run_emission_validation(validated, analyst, region=region, manual_validation=manual_validation)
+    pipeline_output["emission_validation"] = emission_validation
+    coverage = emission_validation.get("coverage", {})
+    comparison = emission_validation.get("comparison", {})
+    print(
+        f"      → Coverage: {coverage.get('mapped_items', 0)}/{coverage.get('total_items', 0)} "
+        f"({coverage.get('coverage_pct', 0)}%) | Diff: {comparison.get('effective_diff_pct', 'N/A')}%"
+    )
+
+    print("[5/6] Recommendation Agent: Generating reduction strategies...")
     recommender = run_recommender_agent(analyst)
     pipeline_output["recommender"] = recommender
     print(f"      → {len(recommender.get('recommendations', []))} recommendations generated")
     print(f"      → Potential savings: {recommender.get('total_potential_savings_kg', 0):.2f} kg CO₂e")
 
-    print("[5/5] Report Writer Agent: Generating ESG report...")
+    print("[6/6] Report Writer Agent: Generating ESG report...")
     report = run_report_writer_agent(pipeline_output)
     pipeline_output["report"] = report
     print(f"      → Report generated ({len(report.get('markdown_report', ''))} chars)")
@@ -77,6 +87,9 @@ def run_full_pipeline(file_path: str, region: str = "us") -> dict:
             "scope1_kg": totals.get("scope1_kg", 0),
             "scope2_kg": totals.get("scope2_kg", 0),
             "scope3_kg": totals.get("scope3_kg", 0),
+            "validation_status": emission_validation.get("status"),
+            "validation_diff_pct": emission_validation.get("deviation_percent"),
+            "coverage_pct": emission_validation.get("coverage", {}).get("coverage_pct"),
             "recommendations_count": len(recommender.get("recommendations", [])),
             "potential_savings_kg": recommender.get("total_potential_savings_kg", 0)
         }

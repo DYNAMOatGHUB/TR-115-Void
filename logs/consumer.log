@@ -1,0 +1,5 @@
+%6|1776375117.386|FAIL|rdkafka#consumer-1| [thrd:localhost:9092/0]: localhost:9092/0: Disconnected: connection closed by peer: receive 0 after POLLIN (after 1585686ms in state UP)
+%6|1776375117.389|FAIL|rdkafka#consumer-1| [thrd:localhost:9092/bootstrap]: localhost:9092/bootstrap: Disconnected: connection reset by peer (after 0ms in state APIVERSION_QUERY)
+%6|1776375117.391|FAIL|rdkafka#consumer-1| [thrd:localhost:9092/0]: localhost:9092/0: Disconnected: connection reset by peer (after 4ms in state APIVERSION_QUERY)
+%6|1776375117.393|FAIL|rdkafka#consumer-1| [thrd:GroupCoordinator]: GroupCoordinator: localhost:9092: Disconnected: connection closed by peer: receive 0 after POLLIN (after 1585586ms in state UP)
+%6|1776375117.397|FAIL|rdkafka#consumer-1| [thrd:GroupCoordinator]: GroupCoordinator: localhost:9092: Disconnected: connection reset by peer (after 3ms in state APIVERSION_QUERY)

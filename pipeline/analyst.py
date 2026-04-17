@@ -6,6 +6,7 @@ Uses: JSON factor DB + unit conversion. LLM only for factor matching when alias 
 
 import json
 import os
+import re
 from pipeline.groq_client import get_groq_client
 
 # Load factor databases
@@ -18,6 +19,15 @@ with open(os.path.join(BASE_DIR, "data/defra_factors.json")) as f:
     DEFRA_FACTORS = json.load(f)
 
 SCOPE_LABELS = {1: "Scope 1 (Direct)", 2: "Scope 2 (Energy)", 3: "Scope 3 (Supply Chain)"}
+REGION_ELECTRICITY_KEY = {"us": "us_average", "uk": "uk_average", "gb": "uk_average", "in": "india_average"}
+
+FACTOR_CONFIDENCE_BY_CATEGORY = {
+    "fuel_combustion": "high",
+    "electricity": "high",
+    "transport": "high",
+    "materials": "medium",
+    "waste": "medium",
+}
 
 ANALYST_SYSTEM_PROMPT = """You are a carbon emission factor specialist.
 Given an activity description and subtype, return the best matching emission factor key from EPA database.
@@ -72,6 +82,8 @@ def unit_convert_to_base(quantity: float, unit: str, factor_unit: str) -> float:
         # Volume
         ("litre", "gallon"): 0.264172,
         ("liter", "gallon"): 0.264172,
+        ("litres", "gallon"): 0.264172,
+        ("liters", "gallon"): 0.264172,
         ("gallon", "litre"): 3.78541,
         ("m3", "scf"): 35.3147,
         ("cubic_metre", "scf"): 35.3147,
@@ -85,6 +97,10 @@ def unit_convert_to_base(quantity: float, unit: str, factor_unit: str) -> float:
         # Distance
         ("km", "mile"): 0.621371,
         ("mile", "km"): 1.60934,
+        # Freight intensity distance units
+        ("tonne_km", "ton_mile"): 0.684909,
+        ("ton-mile", "ton_mile"): 1.0,
+        ("ton_mile", "ton_mile"): 1.0,
     }
 
     key = (unit, factor_base)
@@ -116,6 +132,80 @@ def lookup_factor_by_alias(description: str, activity_subtype: str, db: str = "e
             return category, key, factors[category][key]
 
     return None, None, None
+
+
+def _contains_any(text: str, phrases: list[str]) -> bool:
+    low = (text or "").lower()
+    return any(p in low for p in phrases)
+
+
+def infer_item_region(item: dict, default_region: str = "us") -> str:
+    """Infer region from item fields for per-line electricity factor selection."""
+    text_parts = [
+        item.get("description") or "",
+        item.get("origin") or "",
+        item.get("destination") or "",
+    ]
+    text = " ".join(text_parts).lower()
+
+    if re.search(r"\bindia\b", text):
+        return "in"
+    if re.search(r"\b(united\s+kingdom|great\s+britain|england|uk|gb)\b", text):
+        return "uk"
+    if re.search(r"\b(united\s+states|usa|u\.s\.?a?\.)\b", text):
+        return "us"
+
+    return default_region
+
+
+def rule_based_factor_lookup(item: dict, region: str = "us") -> tuple:
+    """
+    Deterministic factor lookup with domain rules before generic alias matching.
+    Returns (category, key, factor_data, matched_by)
+    """
+    description = (item.get("description") or "").lower()
+    activity_type = (item.get("activity_type") or "").lower()
+    activity_subtype = (item.get("activity_subtype") or "").lower()
+    transport_mode = (item.get("transport_mode") or "").lower()
+
+    # 1) Electricity should be region-aware by default (and per-item where possible)
+    if activity_type == "electricity" or _contains_any(description, ["electricity", "power", "grid", "kwh", "mwh"]):
+        if _contains_any(description, ["solar", "wind", "renewable", "green energy", "clean energy"]):
+            return "electricity", "renewable", EPA_FACTORS["electricity"]["renewable"], "rule:renewable_keyword"
+
+        item_region = infer_item_region(item, default_region=region)
+        region_key = REGION_ELECTRICITY_KEY.get(item_region, "us_average")
+        if region_key in EPA_FACTORS.get("electricity", {}):
+            return "electricity", region_key, EPA_FACTORS["electricity"][region_key], f"rule:region_electricity:{item_region}"
+
+    # 2) Transport mode direct mapping (highest precision for freight docs)
+    transport_map = {
+        "truck": "truck_freight",
+        "rail": "rail_freight",
+        "air": "air_freight",
+        "sea": "sea_freight",
+        "van": "van_freight",
+    }
+    if transport_mode in transport_map and transport_map[transport_mode] in EPA_FACTORS.get("transport", {}):
+        k = transport_map[transport_mode]
+        return "transport", k, EPA_FACTORS["transport"][k], "rule:transport_mode"
+
+    if activity_type == "transport":
+        for tk, key in transport_map.items():
+            if tk in activity_subtype or tk in description:
+                return "transport", key, EPA_FACTORS["transport"][key], "rule:transport_keyword"
+
+    # 3) Alias maps
+    category, key, factor_data = lookup_factor_by_alias(description, activity_subtype, "epa")
+    if factor_data:
+        return category, key, factor_data, "rule:epa_alias"
+
+    if region in ["uk", "gb"]:
+        category, key, factor_data = lookup_factor_by_alias(description, activity_subtype, "defra")
+        if factor_data:
+            return category, key, factor_data, "rule:defra_alias"
+
+    return None, None, None, None
 
 
 def llm_factor_lookup(description: str, activity_subtype: str) -> tuple:
@@ -177,6 +267,10 @@ def calculate_item_emission(item: dict, region: str = "us") -> dict:
         "emission_factor": None,
         "factor_unit": None,
         "factor_source": None,
+        "factor_confidence": None,
+        "factor_match_method": None,
+        "calculation_formula": None,
+        "input_quantity_normalized": None,
         "confidence": item.get("confidence", "medium"),
         "calculation_note": None
     }
@@ -189,7 +283,12 @@ def calculate_item_emission(item: dict, region: str = "us") -> dict:
     if item.get("activity_type") == "transport" and distance:
         # Convert to ton-miles (EPA) or tonne-km (DEFRA)
         weight_kg = quantity
-        weight_tonne = weight_kg / 1000 if unit == "kg" else quantity
+        if unit in ["kg", "kilogram", "kilograms"]:
+            weight_tonne = weight_kg / 1000
+        elif unit in ["ton", "short_ton"]:
+            weight_tonne = quantity * 0.907185
+        else:
+            weight_tonne = quantity
         dist_miles = distance * 0.621371 if distance_unit == "km" else distance
         effective_quantity = weight_tonne * dist_miles
         unit = "ton_mile"
@@ -200,19 +299,17 @@ def calculate_item_emission(item: dict, region: str = "us") -> dict:
         if transport_mode:
             activity_subtype = f"{transport_mode}_freight"
 
-    # Try alias lookup (EPA first)
-    category, key, factor_data = lookup_factor_by_alias(description, activity_subtype, "epa")
+    # Try deterministic hybrid rules first
+    category, key, factor_data, matched_by = rule_based_factor_lookup(item, region=region)
 
-    # DEFRA fallback for UK
-    if not factor_data and region in ["uk", "gb"]:
-        category, key, factor_data = lookup_factor_by_alias(description, activity_subtype, "defra")
-        if factor_data:
-            result["factor_source"] = "DEFRA"
+    if factor_data and matched_by == "rule:defra_alias":
+        result["factor_source"] = "DEFRA"
 
     # LLM fallback
     if not factor_data:
         category, key, factor_data = llm_factor_lookup(description, activity_subtype)
         if factor_data:
+            matched_by = "llm_lookup"
             result["calculation_note"] = (result.get("calculation_note") or "") + " [LLM factor match]"
 
     if not factor_data:
@@ -225,7 +322,7 @@ def calculate_item_emission(item: dict, region: str = "us") -> dict:
     scope = factor_data.get("scope", 3)
 
     if not result.get("factor_source"):
-        result["factor_source"] = "EPA GHG Hub 2024"
+        result["factor_source"] = "EPA GHG Hub 2025"
 
     # Unit conversion
     converted_qty = unit_convert_to_base(quantity, unit, factor_unit)
@@ -239,7 +336,11 @@ def calculate_item_emission(item: dict, region: str = "us") -> dict:
         "scope_label": SCOPE_LABELS.get(scope, "Scope 3"),
         "emission_factor": factor,
         "factor_unit": factor_unit,
-        "factor_key": f"{category}.{key}"
+        "factor_key": f"{category}.{key}",
+        "factor_confidence": factor_data.get("confidence") or FACTOR_CONFIDENCE_BY_CATEGORY.get(category, "medium"),
+        "factor_match_method": matched_by or "rule:fallback",
+        "input_quantity_normalized": round(converted_qty, 6),
+        "calculation_formula": f"{round(converted_qty, 6)} × {factor} = {round(co2e, 3)} kg CO2e"
     })
 
     return result

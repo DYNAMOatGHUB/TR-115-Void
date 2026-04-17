@@ -1,0 +1,85 @@
+PAGE 1 TABLE 1: Natural Gas | 0.001026 | 53.06 | 1.0 | 0.10 | 0.05444 | 0.00103 | 0.00010
+PAGE 1 TABLE 1: Aviation Gasoline | 0.120 | 69.25 | 3.0 | 0.60 | 8.31 | 0.36 | 0.07
+PAGE 1 TABLE 1: Motor Gasoline | 0.125 | 70.22 | 3.0 | 0.60 | 8.78 | 0.38 | 0.08
+PAGE 1 TABLE 1: Natural Gasoline | 0.110 | 66.88 | 3.0 | 0.60 | 7.36 | 0.33 | 0.07
+PAGE 1 TABLE 1: Biodiesel (100%) | 0.128 | 73.84 | 1.1 | 0.11 | 9.45 | 0.14 | 0.01
+PAGE 2 TABLE 1: Aviation Gasoline | 8.31 | gallon
+PAGE 2 TABLE 1: Biodiesel (100%) | 9.45 | gallon
+PAGE 2 TABLE 1: Compressed Natural Gas (CNG) | 0.05444 | scf
+PAGE 2 TABLE 1: Diesel Fuel | 10.21 | gallon
+PAGE 2 TABLE 1: Liquefied Natural Gas (LNG) | 4.50 | gallon
+PAGE 2 TABLE 1: Motor Gasoline | 8.78 | gallon
+PAGE 2 TABLE 3: Table 3 | Mobile Combustion CH4 and N2O for On-Road Gasoline Vehicl | es
+PAGE 2 TABLE 3: Gasoline Passenger Cars | 1973-1974 | 0.1696 | 0.0197
+PAGE 2 TABLE 3: Gasoline Light-Duty Trucks (Vans, Pickup Trucks, SUVs) | 1973-1974 | 0.1908 | 0.0218
+PAGE 2 TABLE 3: Gasoline Heavy-Duty Vehicles | ≤1980 | 0.4604 | 0.0497
+PAGE 2 TABLE 3: Gasoline Motorcycles | 1960-1995 | 0.0090 | 0.0900
+PAGE 3 TABLE 1: Table 4 | Mobile Combustion CH4 and | N2O for On-Road Diesel and Alternative Fuel Vehicles
+PAGE 3 TABLE 1: Passenger Cars | Diesel | 1960-1982 | 0.0006 | 0.0012
+PAGE 3 TABLE 1: Light-Duty Trucks | Diesel | 1960-1982 | 0.0011 | 0.0017
+PAGE 3 TABLE 1: Medium- and Heavy-Duty Vehicles | Diesel | 1960-2006 | 0.0051 | 0.0048
+PAGE 3 TABLE 1: Biodiesel | 0.0300 | 0.0010
+PAGE 3 TABLE 1: Light-Duty Trucks | Ethanol | 0.0130 | 0.0050
+PAGE 3 TABLE 1: Biodiesel | 0.0540 | 0.0010
+PAGE 3 TABLE 1: Medium-Duty Trucks | CNG | 1.7860 | 0.0330
+PAGE 3 TABLE 1: Biodiesel | 0.0090 | 0.0050
+PAGE 3 TABLE 1: Heavy-Duty Trucks | Methanol | 0.0720 | 0.0260
+PAGE 3 TABLE 1: Biodiesel | 0.0090 | 0.0020
+PAGE 3 TABLE 1: Biodiesel | 0.0090 | 0.0030
+PAGE 3 TABLE 2: Ships and Boats | Residual Fuel Oil | 1.10 | 0.31
+PAGE 3 TABLE 2: Gasoline (2 stroke) | 4.67 | 0.08
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 2.27 | 0.01
+PAGE 3 TABLE 2: Diesel | 6.51 | 0.17
+PAGE 3 TABLE 2: Locomotives | Diesel | 0.80 | 0.26
+PAGE 3 TABLE 2: Aircraft | Jet Fuel | 0 | 0.30
+PAGE 3 TABLE 2: Aviation Gasoline | 7.06 | 0.11
+PAGE 3 TABLE 2: Agricultural EquipmentA | Gasoline (2 stroke) | 6.90 | 0.47
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 1.93 | 1.20
+PAGE 3 TABLE 2: Gasoline Off-Road Trucks | 1.93 | 1.20
+PAGE 3 TABLE 2: Diesel Equipment | 1.26 | 1.07
+PAGE 3 TABLE 2: Diesel Off-Road Trucks | 0.92 | 0.56
+PAGE 3 TABLE 2: Construction/Mining EquipmentB | Gasoline (2 stroke) | 8.00 | 0.12
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 2.86 | 1.48
+PAGE 3 TABLE 2: Gasoline Off-Road Trucks | 2.86 | 1.48
+PAGE 3 TABLE 2: Diesel Equipment | 1.01 | 0.94
+PAGE 3 TABLE 2: Diesel Off-Road Trucks | 0.92 | 0.56
+PAGE 3 TABLE 2: Lawn and Garden Equipment | Gasoline (2 stroke) | 7.34 | 0.31
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 3.02 | 1.50
+PAGE 3 TABLE 2: Diesel | 0.67 | 0.49
+PAGE 3 TABLE 2: Airport Equipment | Gasoline | 1.07 | 1.12
+PAGE 3 TABLE 2: Diesel | 1.98 | 1.21
+PAGE 3 TABLE 2: Industrial/Commercial Equipment | Gasoline (2 stroke) | 7.30 | 0.51
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 2.81 | 1.57
+PAGE 3 TABLE 2: Diesel | 0.43 | 0.62
+PAGE 3 TABLE 2: Logging Equipment | Gasoline (2 stroke) | 9.62 | 0
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 3.22 | 2.05
+PAGE 3 TABLE 2: Diesel | 0.49 | 1.26
+PAGE 3 TABLE 2: Railroad Equipment | Gasoline | 3.32 | 1.86
+PAGE 3 TABLE 2: Diesel | 0.41 | 0.97
+PAGE 3 TABLE 2: Recreational Equipment | Gasoline (2 stroke) | 9.86 | 0.11
+PAGE 3 TABLE 2: Gasoline (4 stroke) | 2.74 | 1.49
+PAGE 3 TABLE 2: Diesel | 0.73 | 0.66
+PAGE 3 TABLE 2: Table 6 | Electricity
+PAGE 3 TABLE 2: Notes: _ _ Total output emission factors can be used as default factors for estimating GHG emissions from electricity use when developing a carbon footprint or emissions inventory. Annual non-baseload output emission factors should not be used when developing a carbon footprint or emissions inventory, but can be used to estimate GHG emissions reductions on the grid from changes in electricity use. Grid gross loss % factors provide the Transmission & Distribution loss rates for electricity only, and should not be applied to scope 2 emissions for an end-user. They can assist in calculating one component of Scope 3 Category 3 Fuel- and Energy-Related Activities emissions, Activity C. For technical information, reference the EPA's eGRID Technical Guide
+PAGE 4 TABLE 1: Table 7 | Steam and Heat
+PAGE 4 TABLE 1: Steam and Heat | 66.33 | 1.250 | 0.125
+PAGE 4 TABLE 1: Notes: Emission factors are per mmBtu of steam or heat purchased. These factors assume natural gas fuel is used to generate steam or heat at 80 percent thermal efficiency.
+PAGE 4 TABLE 2: Medium- and Heavy-Duty Truck | 1.298 | 0.0115 | 0.0376 | vehicle-mile
+PAGE 4 TABLE 2: Passenger Car A | 0.297 | 0.0059 | 0.0053 | vehicle-mile
+PAGE 4 TABLE 2: Light-Duty Truck B | 0.394 | 0.0109 | 0.0088 | vehicle-mile
+PAGE 4 TABLE 2: Medium- and Heavy-Duty TruckC | 0.186 | 0.0016 | 0.0054 | short ton-mile
+PAGE 4 TABLE 2: Rail | 0.021 | 0.0016 | 0.0005 | short ton-mile
+PAGE 4 TABLE 2: Aircraft | 1.086 | 0 | 0.0334 | short ton-mile
+PAGE 4 TABLE 2: Source: C VeO h2i, C leH -m4, la en d aN t2aO oe rm oi ns -s ri oo an ds vd ea hta lf eo sr o an re-r o fra od v Te ah bic ll ee ss Aa -r 7e f r -o Am T 3a ob fl e 2 e- 1 E3 o Af (th 20e E 4P A v(2 e0 n2 to4 r) I n ov e Un .t So .r y o ref eU n.S ho. uG sr ee e Gn ah so u Es me sG sa ios E m anis ds i Son ins sa :n 1d S 9i 0n –k 2s 0: 21 29 9 (A0 n-2 n0 e2 x2 e. c i s d f ic m 1 -7 th P 2 ) In y f G i n s k 9 s). C FrO ei2ge e m toi nss -mio in les dd aa tt aa afo rer n fro on m-r o Ta ad lv ee 1h -i 5cl 0e s fa tr he b Ba use red o un T a Tb rale sA p- o9 r3 ao tf t nh e E taP tiA i( c2 s0 ,2 N4 a) tI in ov ne an t To rr ay o sf U o. rS ta. iG onre Sen tah tio su tis ce G (2a 0s 4E )m 2is 0s 2io 2n ds a tan .d Sinks: 1990-2022 (Annexes), which are distributed into CO2, CH4, and N2O emissions based on fuel/vehicle emission factors. h t b o e a o f n t io S st l n p t s 2 : a Notes: Vehicle-mile factors are appropriate to use when the entire vehicle is dedicated to transporting the reporting company's product. Ton-mile factors are appropriate when the vehicle is shared with products from other companies. The factors represented in the table above represent combustion emissions only (tank-to-wheel) and do not represent upstream emissions or well-to-wheel emissions. A Passenger cars are automobiles used primarily to transport 12 people or less for personal travel, and are less than 8,500 lbs in gross vehicle weight. B Light-duty trucks are vehicles that primarily transport passengers such as sport utility vehicles (SUVs) and minivans. This category also includes vehicles used for transporting light-weight cargo which are equipped with special features such as four-wheel drive for off-road operation. The gross vehicle weight normally ranges around 8,500 pounds or less. C Medium- and heavy-duty trucks are vehicles with a gross vehicle weight of more than around 8,500 pounds, such as single unit trucks, combination trucks, tractor-trailers, and box trucks used for freight transportation. In addition, this category includes some vehicles that are not typically used for freight movement such as service and utility trucks.
+PAGE 4 TABLE 2: Dairy Products | NA | 0.72 | 0.05 | 0.11 | 0.14 | 0.11
+PAGE 5 TABLE 1: Passenger Car A | 0.297 | 0.0059 | 0.0053 | vehicle-mile
+PAGE 5 TABLE 1: Light-Duty Truck B | 0.394 | 0.0109 | 0.0088 | vehicle-mile
+PAGE 5 TABLE 1: Intercity Rail - Northeast Corridor C | 0.023 | 0.0010 | 0.0001 | passenger-mile
+PAGE 5 TABLE 1: Intercity Rail - Other Routes C | 0.149 | 0.0120 | 0.0040 | passenger-mile
+PAGE 5 TABLE 1: Intercity Rail - National Average C | 0.096 | 0.0080 | 0.0020 | passenger-mile
+PAGE 5 TABLE 1: Commuter Rail D | 0.133 | 0.0105 | 0.0026 | passenger-mile
+PAGE 5 TABLE 1: Transit Rail (i.e. Subway, Tram) E | 0.093 | 0.0075 | 0.0010 | passenger-mile
+PAGE 5 TABLE 1: Air Travel - Short Haul (< 300 miles) | 0.207 | 0.0064 | 0.0066 | passenger-mile
+PAGE 5 TABLE 1: Air Travel - Medium Haul (>= 300 miles, < 2300 miles) | 0.129 | 0.0006 | 0.0041 | passenger-mile
+PAGE 5 TABLE 1: Air Travel - Long Haul (>= 2300 miles) | 0.163 | 0.0006 | 0.0052 | passenger-mile
+PAGE 5 TABLE 1: Source: C VeO h2i, C leH -m4, la en d aN t2aO oe rm oi ns -s ri oo an ds vd ea hta lf eo sr h ai rg eh fw roa my v Te ah bic lele ss a -7re f -r o Am 3T a ob l te 2 e- E13 Aof (t 2h 0e 4E )P IA v( e2 n0 t2 o4 ry) I on fv Uen .Sto r Gy ro ef U n. hS o. G sere Gen ah so Eu mse G sia os sE am nis ds Sio in ns sa n 1d 9S 0in –k 2s 0: 1 29 (9 A0 n– n2 e0 x2 e2 s. c i s d f ic A 1 -7 f h P 2 n . e u is n k : 9 2 ) . Passenger-miles data for buses are from Table VM-1 of the Federal Highway Administration Highway Statistics (2024): 2022 data. Fuel consumption data and passenger-miles data for rail are from Tables A.14 - A.16, 10-10, and 7.3 - 7.4 of the Transportation Energy Data Book: Edition 40 (2022): 2019 data. Fuel consumption was converted to emissions by using fuel and electricity emission factors presented in the tables above. Intercity Rail factors from communication with Amtrak, December 2024, based on 2023 data. Air Travel factors from 2022 Guidelines to Defra / DECC's GHG Conversion Factors for Company Reporting. Version 2.0 June 2022. Defra air travel emission factors held constant from 2022 release (2018 activity data) to more accurately reflect the current state of business travel as the 2023 and 2024 Defra release reflects significantly reduced load factors during COVID-19. Notes: The factors represented in the table above represent combustion emissions only (tank-to-wheel) and do not represent upstream emissions or well-to-wheel emissions. A Passenger cars are automobiles used primarily to transport 12 people or less for personal travel, and are less than 8,500 lbs in gross vehicle weight. B Light-duty trucks are vehicles that primarily transport passengers such as sport utility vehicles (SUVs) and minivans. This category also includes vehicles used for transporting light-weight cargo which are equipped with special features such as four-wheel drive for off-road operation. The gross vehicle weight normally ranges around 8,500 pounds or less. C Intercity rail: Amtrak long-distance rail between major cities. Northeast Corridor extends from Boston to Washington D.C. Other Routes are all routes outside the Northeast Corridor. D Commuter rail: rail service between a central city and adjacent suburbs (also called regional rail or suburban rail). E Transit rail: rail typically within an urban center, such as subways, elevated railways, metropolitan railways (metro), streetcars, trolley cars, and tramways.

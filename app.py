@@ -189,7 +189,13 @@ def format_extracted_items(items: list) -> str:
     return "\n".join(lines)
 
 
-def format_narrative_insights(totals: dict, by_type: dict, recommendations: list, extracted_items: list) -> str:
+def format_narrative_insights(
+    totals: dict,
+    by_type: dict,
+    recommendations: list,
+    extracted_items: list,
+    emission_validation: dict | None = None,
+) -> str:
     """Create a plain-language interpretation for non-technical users."""
     total_kg = totals.get("total_kg", 0)
     scope1 = totals.get("scope1_kg", 0)
@@ -267,7 +273,108 @@ def format_narrative_insights(totals: dict, by_type: dict, recommendations: list
         lines.append("")
         lines.append(f"The analysis is based on {items_count} extracted line items.")
 
+    if emission_validation:
+        coverage = emission_validation.get("coverage", {})
+        deviation = emission_validation.get("deviation_percent", emission_validation.get("comparison", {}).get("effective_diff_pct", "N/A"))
+        confidence_label = emission_validation.get("confidence", "UNKNOWN")
+        confidence_score = emission_validation.get("confidence_score_pct", 0)
+        lines.append("")
+        lines.append("### Validation")
+        lines.append(
+            f"Status: {emission_validation.get('status', 'N/A')} | "
+            f"Coverage: {coverage.get('mapped_items', 0)}/{coverage.get('total_items', 0)} "
+            f"({coverage.get('coverage_pct', 0)}%) | "
+            f"Diff: {deviation}% | "
+            f"Confidence: {confidence_score}% ({confidence_label})."
+        )
+
+        why = emission_validation.get("why_difference", [])
+        if why:
+            lines.append("Potential difference drivers: " + "; ".join(why[:3]) + ".")
+
     return "\n".join(lines)
+
+
+def format_validation_report_html(emission_validation: dict) -> str:
+        if not emission_validation:
+                return "<div class='summary-note'>Validation data unavailable.</div>"
+
+        status = emission_validation.get("status", "REVIEW")
+        confidence = emission_validation.get("confidence", "UNKNOWN")
+        deviation = emission_validation.get("deviation_percent")
+        coverage = emission_validation.get("coverage", {})
+        system_total = emission_validation.get("system_total", 0)
+        reference_total = emission_validation.get("reference_total", 0)
+        explanation = emission_validation.get("explanation", "No explanation available.")
+        mode = emission_validation.get("mode", "auto")
+        breakdown = emission_validation.get("breakdown", {})
+
+        if status == "APPROVED":
+                status_color = "#10b981"
+                status_badge = "✔ APPROVED"
+        elif status == "REVIEW":
+                status_color = "#f59e0b"
+                status_badge = "⚠ REVIEW"
+        else:
+                status_color = "#ef4444"
+                status_badge = "✖ REJECTED"
+
+        def confidence_color(diff):
+                if diff is None:
+                        return "#94a3b8"
+                if diff <= 5:
+                        return "#10b981"
+                if diff <= 10:
+                        return "#f59e0b"
+                return "#ef4444"
+
+        def scope_row(scope_key: str, title: str) -> str:
+                scope = breakdown.get(scope_key, {})
+                s = scope.get("system")
+                r = scope.get("reference")
+                d = scope.get("deviation_percent")
+                c = scope.get("confidence", "UNKNOWN")
+                bar_color = confidence_color(d)
+                width = 0 if d is None else min(d, 100)
+                return (
+                        f"<tr>"
+                        f"<td>{title}</td>"
+                        f"<td>{s if s is not None else 'N/A'}</td>"
+                        f"<td>{r if r is not None else 'N/A'}</td>"
+                        f"<td>{d if d is not None else 'N/A'}%</td>"
+                        f"<td>{c}</td>"
+                        f"<td><div style='background: rgba(255,255,255,0.08); height: 8px; border-radius: 6px; overflow: hidden; min-width: 120px;'>"
+                        f"<div style='width:{width}%; background:{bar_color}; height:100%;'></div></div></td>"
+                        f"</tr>"
+                )
+
+        return f"""
+        <div class='summary-note' style='border-left-color:{status_color};'>
+            <h3 style='margin:0 0 8px 0;'>Validation Report</h3>
+            <div><b>Mode:</b> {mode}</div>
+            <div><b>Status:</b> <span style='color:{status_color};font-weight:700'>{status_badge}</span></div>
+            <div><b>Deviation:</b> {deviation if deviation is not None else 'N/A'}%</div>
+            <div><b>Confidence:</b> {confidence} ({emission_validation.get('confidence_score_pct', 0)}%)</div>
+            <div><b>Coverage:</b> {coverage.get('mapped_items', 0)}/{coverage.get('total_items', 0)} ({coverage.get('coverage_pct', 0)}%)</div>
+            <div><b>System Total:</b> {system_total} kg CO2e</div>
+            <div><b>Reference Total:</b> {reference_total if reference_total is not None else 'N/A'} kg CO2e</div>
+            <div style='margin-top:8px;'><b>Explanation:</b> {explanation}</div>
+            <div style='margin-top:10px;'>
+                <table style='width:100%; border-collapse: collapse;'>
+                    <thead>
+                        <tr>
+                            <th style='text-align:left;'>Scope</th><th>System</th><th>Reference</th><th>Diff</th><th>Confidence</th><th>Bar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {scope_row('scope1', 'Scope 1')}
+                        {scope_row('scope2', 'Scope 2')}
+                        {scope_row('scope3', 'Scope 3')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        """
 
 
 def _markdown_to_plain_lines(markdown: str) -> list[str]:
@@ -410,10 +517,21 @@ def _normalize_company_id(company_name: str | None) -> str:
     return company_id or "demo_company"
 
 
-def process_document(file, region, company_name, email_address=None):
+def process_document(
+    file,
+    region,
+    company_name,
+    email_address=None,
+    validation_mode="Auto Analysis",
+    manual_scope1=None,
+    manual_scope2=None,
+    manual_scope3=None,
+    manual_total=None,
+):
     if file is None:
         return (
             "Please upload a file first.",
+            "",
             "",
             None, None, None,
             "No data",
@@ -425,12 +543,23 @@ def process_document(file, region, company_name, email_address=None):
     region_map = {"US (EPA)": "us", "UK (DEFRA)": "uk", "India": "in"}
     region_code = region_map.get(region, "us")
 
+    manual_validation = None
+    if validation_mode == "Validate Results":
+        manual_validation = {
+            "manual_scope1": manual_scope1,
+            "manual_scope2": manual_scope2,
+            "manual_scope3": manual_scope3,
+            "manual_total": manual_total,
+        }
+
     try:
-        result = run_full_pipeline(file.name, region=region_code)
+        file_path = file.name if hasattr(file, "name") else str(file)
+        result = run_full_pipeline(file_path, region=region_code, manual_validation=manual_validation)
 
         if not result.get("success"):
             return (
                 f"Pipeline error: {result.get('error', 'Unknown error')}",
+                "",
                 "",
                 None, None, None,
                 "Error",
@@ -442,6 +571,7 @@ def process_document(file, region, company_name, email_address=None):
         po = result["pipeline_output"]
         analyst = po.get("analyst", {})
         recommender = po.get("recommender", {})
+        emission_validation = po.get("emission_validation", {})
         report = po.get("report", {})
         extracted = po.get("extracted", {})
         totals = analyst.get("totals", {})
@@ -480,7 +610,14 @@ def process_document(file, region, company_name, email_address=None):
                 "Set GROQ_API_KEY for higher-quality LLM extraction.</div>"
             )
 
-        narrative_md = format_narrative_insights(totals, by_type, recs, extracted_items)
+        narrative_md = format_narrative_insights(
+            totals,
+            by_type,
+            recs,
+            extracted_items,
+            emission_validation=emission_validation,
+        )
+        validation_html = format_validation_report_html(emission_validation)
 
         # Charts
         scope_chart = build_scope_chart(totals) if total_kg > 0 else None
@@ -523,6 +660,7 @@ def process_document(file, region, company_name, email_address=None):
         return (
             summary_html,
             narrative_md,
+            validation_html,
             scope_chart,
             pie_chart,
             rec_chart,
@@ -537,6 +675,7 @@ def process_document(file, region, company_name, email_address=None):
         tb = traceback.format_exc()
         return (
             f"Unexpected error: {str(e)}",
+            "",
             "",
             None, None, None,
             tb[:500],
@@ -1045,6 +1184,19 @@ with gr.Blocks(
                     type="email",
                     value=""
                 )
+
+                validation_mode = gr.Radio(
+                    choices=["Auto Analysis", "Validate Results"],
+                    value="Auto Analysis",
+                    label="Validation Mode"
+                )
+                with gr.Column(visible=False) as validation_panel:
+                    gr.Markdown("### Manual Verification (Optional)")
+                    manual_scope1_input = gr.Number(label="Manual Scope 1 (kg CO2)", value=None)
+                    manual_scope2_input = gr.Number(label="Manual Scope 2 (kg CO2)", value=None)
+                    manual_scope3_input = gr.Number(label="Manual Scope 3 (kg CO2)", value=None)
+                    manual_total_input = gr.Number(label="Manual Total (kg CO2, optional)", value=None)
+
                 analyze_btn = gr.Button("Analyze Emissions", variant="primary", size="lg")
 
                 gr.Markdown("### Try Sample Documents")
@@ -1061,6 +1213,7 @@ with gr.Blocks(
                 )
 
         narrative_out = gr.Markdown(elem_classes=["summary-box", "content-panel"])
+        validation_out = gr.HTML(elem_classes=["summary-box", "content-panel"])
 
         with gr.Tabs(elem_classes=["gr-tabs"]):
             with gr.TabItem("Visualizations"):
@@ -1093,10 +1246,21 @@ with gr.Blocks(
 
     analyze_btn.click(
         fn=process_document,
-        inputs=[file_input, region_select, company_input, email_input],
+        inputs=[
+            file_input,
+            region_select,
+            company_input,
+            email_input,
+            validation_mode,
+            manual_scope1_input,
+            manual_scope2_input,
+            manual_scope3_input,
+            manual_total_input,
+        ],
         outputs=[
             summary_out,
             narrative_out,
+            validation_out,
             scope_chart_out,
             pie_chart_out,
             rec_chart_out,
@@ -1106,6 +1270,15 @@ with gr.Blocks(
             download_report_pdf_btn
         ],
         show_progress="full"
+    )
+
+    def _toggle_validation_panel(mode):
+        return gr.update(visible=(mode == "Validate Results"))
+
+    validation_mode.change(
+        fn=_toggle_validation_panel,
+        inputs=[validation_mode],
+        outputs=[validation_panel],
     )
 
 if __name__ == "__main__":
